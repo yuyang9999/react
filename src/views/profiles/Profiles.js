@@ -1,10 +1,9 @@
 
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
-import {createNewProfile, deleteOneProfile} from '../../store/actions';
+import {createNewProfile, deleteProfiles, selectProfile, unselectProfile} from '../../store/actions';
 
-
-var profile_names = ['profile1', 'profile2', 'profile3'];
+import store from '../../store/store';
 
 
 
@@ -32,6 +31,58 @@ AddProfile.propTypes = {
     onAddClick: React.PropTypes.func.isRequired,
 };
 
+class DeleteProfile extends Component {
+    constructor(props) {
+        super(props);
+
+
+    }
+
+    componentWillMount() {
+        console.log("will mount");
+    }
+
+    componentDidMount() {
+        console.log('did mount');
+
+        var self = this;
+
+        this.unscribe = store.subscribe(()=> {
+            const state = store.getState();
+            if (state.selectedProfilesReducer.length >= 1) {
+                self.btn.disabled = false;
+            } else {
+                self.btn.disabled = true;
+            }
+        })
+    }
+
+    componentWillUnmount() {
+        this.unscribe();
+    }
+
+    handleDeleteBtnPressed(e) {
+        let arr = store.getState().selectedProfilesReducer;
+        store.dispatch(deleteProfiles(arr));
+    }
+
+    render() {
+        return (
+            <div>
+                <button ref={(ref) => this.btn = ref}
+                    onClick={(e)=> {
+                        this.handleDeleteBtnPressed(e);
+                }}>
+                    delete
+                </button>
+            </div>
+        )
+    }
+}
+
+
+
+
 class ProfileList extends Component {
     render() {
         return (
@@ -53,10 +104,21 @@ ProfileList.propTypes = {
 };
 
 class Profile extends Component {
+    checkStatusChanged(evt) {
+        const node = this.input;
+        const checked = node.checked;
+
+        if (checked) {
+            store.dispatch(selectProfile(this.props.profile.name));
+        } else {
+            store.dispatch(unselectProfile(this.props.profile.name));
+        }
+    }
+
     render() {
         return (
             <li>
-                <input type={'checkbox'}>
+                <input type={'checkbox'} onChange={(e)=>this.checkStatusChanged(e)} ref={(ref)=>this.input = ref}>
                 </input>
                 <text>{this.props.profile.name}</text>
             </li>
@@ -66,6 +128,8 @@ class Profile extends Component {
 
 Profile.propTypes = {
     profile: React.PropTypes.object.isRequired,
+    profileOnChecked: React.PropTypes.func,
+    profileOnUnChecked: React.PropTypes.func
 };
 
 
@@ -76,16 +140,16 @@ class ProfileWrapper extends  Component {
         return (
             <div>
                 <AddProfile onAddClick={(name)=> dispatch(createNewProfile(name))}/>
-
+                <DeleteProfile/>
                 <ProfileList profiles={profiles} />
             </div>
         );
     }
 }
 
-
+//map from store to the properties
 function select(state) {
-    return {profiles: state};
+    return {profiles: state.profilesReducer};
 }
 
 
