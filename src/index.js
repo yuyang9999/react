@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import About from './views/about';
 import Profiles from './views/profiles/Profiles';
+import DetailProfile from './views/profiles/profileDetail';
+
 import registerServiceWorker from './registerServiceWorker';
 
 
@@ -19,15 +21,16 @@ import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
 
 // ReactDOM.render(<App />, document.getElementById('root'));
 ReactDOM.render((
+    <Provider store={store}>
     <Router>
         <div>
             <Route exact path="/" component={App} />
             <Route path={"/about"} component={About} />
-            <Provider store={store}>
-                <Route path={"/profiles"} component={Profiles} />
-            </Provider>
+            <Route path={"/profiles"} component={Profiles} />
+            <Route path={"/profile/:profile_id"} component={DetailProfile} />
         </div>
     </Router>
+    </Provider>
 ), document.getElementById('root'));
 
 registerServiceWorker();

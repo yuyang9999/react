@@ -1,6 +1,6 @@
 
 import {combineReducers} from 'redux';
-import {CREATE_NEW_PROFILE, DELETE_PROFILES, SELECT_PROFILE, UNSELET_PROFILE} from './actions';
+import {CREATE_NEW_PROFILE, DELETE_PROFILES, REMOVE_SELECT_PROFILES, SELECT_PROFILE, UNSELET_PROFILE} from './actions';
 
 function profilesReducer(state = [], action) {
     switch (action.type) {
@@ -45,6 +45,10 @@ function selectedProfilesReducer(state = [], action) {
                     ...state.slice(idx+1)
                 ];
             }
+        case REMOVE_SELECT_PROFILES:
+            //reset all selected profiles
+            return [];
+
         default:
             return state;
     }

@@ -1,10 +1,13 @@
 
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
-import {createNewProfile, deleteProfiles, selectProfile, unselectProfile} from '../../store/actions';
+import {
+    createNewProfile, deleteProfiles, resetSelectProfiles, selectProfile,
+    unselectProfile
+} from '../../store/actions';
 
 import store from '../../store/store';
-
+import {Link} from 'react-router-dom';
 
 
 class AddProfile extends Component {
@@ -32,11 +35,6 @@ AddProfile.propTypes = {
 };
 
 class DeleteProfile extends Component {
-    constructor(props) {
-        super(props);
-
-
-    }
 
     componentWillMount() {
         console.log("will mount");
@@ -44,7 +42,6 @@ class DeleteProfile extends Component {
 
     componentDidMount() {
         console.log('did mount');
-
         var self = this;
 
         this.unscribe = store.subscribe(()=> {
@@ -54,19 +51,29 @@ class DeleteProfile extends Component {
             } else {
                 self.btn.disabled = true;
             }
-        })
+        });
+
+        if (store.getState().selectedProfilesReducer.length === 0) {
+            this.btn.disabled = true;
+        }
+
+
     }
 
     componentWillUnmount() {
         this.unscribe();
+        store.dispatch(resetSelectProfiles());
     }
 
     handleDeleteBtnPressed(e) {
         let arr = store.getState().selectedProfilesReducer;
+        //todo: 有更好的方法吗？
         store.dispatch(deleteProfiles(arr));
+        store.dispatch(resetSelectProfiles());
     }
 
     render() {
+
         return (
             <div>
                 <button ref={(ref) => this.btn = ref}
@@ -89,7 +96,7 @@ class ProfileList extends Component {
             <ul>
                 {
                     this.props.profiles.map((profile, idx)=> {
-                    return <Profile profile={profile} key={idx} />
+                    return <Profile profile={profile} key={profile.name} />
                     })
                 }
             </ul>
@@ -120,7 +127,9 @@ class Profile extends Component {
             <li>
                 <input type={'checkbox'} onChange={(e)=>this.checkStatusChanged(e)} ref={(ref)=>this.input = ref}>
                 </input>
-                <text>{this.props.profile.name}</text>
+                <Link to={'/profile/' + this.props.profile.name}>
+                    <text>{this.props.profile.name}</text>
+                </Link>
             </li>
         );
     }

@@ -5,6 +5,7 @@ export const CREATE_NEW_PROFILE = 'create_new_profile';
 export const DELETE_PROFILES = 'delete_profiles';
 export const SELECT_PROFILE = 'select_profile';
 export const UNSELET_PROFILE = 'unselect_profile';
+export const REMOVE_SELECT_PROFILES = 'remove_select_profiles';
 
 
 /**
@@ -24,4 +25,8 @@ export function selectProfile(profileName) {
 
 export function unselectProfile(profileName) {
     return {type: UNSELET_PROFILE, profileName};
+}
+
+export function resetSelectProfiles() {
+    return {type: REMOVE_SELECT_PROFILES};
 }
