@@ -1,70 +1,93 @@
 
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
+import {createNewProfile, deleteOneProfile} from '../../store/actions';
+
 
 var profile_names = ['profile1', 'profile2', 'profile3'];
 
-class Profiles extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    deleteProfilesBtnPressed(evt) {
-        console.log(evt.target);
-    }
-
-    render() {
-        for(let i = 0; i < profile_names.length; i++) {
-            let name = profile_names[i];
-            console.log(name);
-        }
-
-        let children = [];
-        profile_names.forEach((name, idx, arr)=> {
-            children.push(<OneProfile name={name} />);
-        });
-
-        return (
-            <div>
-            <input type={'checkbox'} onInput={(evt)=> {
-                console.log(evt);
-                console.log(this);
-            }} />
-                <text>Edit</text>
-                <button onClick={this.deleteProfilesBtnPressed} disabled={true}>delete</button>
-                <br />
-                <h1>this is second line</h1>
-                {children}
-            </div>
-        );
-    }
-}
 
 
-
-class OneProfile extends  Component {
-    inputChanged(evt) {
-        let target = evt.target;
-
-        // this.props.selectFunction();
+class AddProfile extends Component {
+    handleClick(e) {
+        const node = this.refs.input;
+        const text = node.value.trim();
+        this.props.onAddClick(text);
+        node.value = "";
     }
 
     render() {
         return (
             <div>
-                <input type={'checkbox'} onChange={this.inputChanged} />
-                <text>{this.props.name}</text>
+                <input type={'text'} ref={'input'} />
+                <button onClick={(e)=> {
+                    this.handleClick(e)
+                }}>Add</button>
             </div>
+        )
+    }
+}
+
+AddProfile.propTypes = {
+    onAddClick: React.PropTypes.func.isRequired,
+};
+
+class ProfileList extends Component {
+    render() {
+        return (
+            <ul>
+                {
+                    this.props.profiles.map((profile, idx)=> {
+                    return <Profile profile={profile} key={idx} />
+                    })
+                }
+            </ul>
         );
     }
 }
 
-OneProfile.propTypes = {
-    name: React.PropTypes.string,
-    selectFunction: React.PropTypes.func
+ProfileList.propTypes = {
+    profiles: React.PropTypes.arrayOf(React.PropTypes.shape({
+        name: React.PropTypes.string.isRequired,
+    }).isRequired).isRequired,
+};
+
+class Profile extends Component {
+    render() {
+        return (
+            <li>
+                <input type={'checkbox'}>
+                </input>
+                <text>{this.props.profile.name}</text>
+            </li>
+        );
+    }
+}
+
+Profile.propTypes = {
+    profile: React.PropTypes.object.isRequired,
 };
 
 
+class ProfileWrapper extends  Component {
+    render() {
+        const {dispatch, profiles} = this.props;
+
+        return (
+            <div>
+                <AddProfile onAddClick={(name)=> dispatch(createNewProfile(name))}/>
+
+                <ProfileList profiles={profiles} />
+            </div>
+        );
+    }
+}
 
 
-export default Profiles;
+function select(state) {
+    return {profiles: state};
+}
+
+
+export default connect(select)(ProfileWrapper);
 

@@ -11,7 +11,7 @@ export function createNewProfile(profileName) {
     return {type: CREATE_NEW_PROFILE, profileName};
 }
 
-export function delteOneProfile(index) {
+export function deleteOneProfile(index) {
     return {type: DELETE_ONE_PROFILE, index};
 }
 

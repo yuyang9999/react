@@ -2,7 +2,7 @@
 
 import {CREATE_NEW_PROFILE, DELETE_ONE_PROFILE} from './actions';
 
-function profileChanges(state = [], action) {
+function storeReducer(state = [], action) {
     switch (action.type) {
         case CREATE_NEW_PROFILE:
             return [
@@ -10,13 +10,15 @@ function profileChanges(state = [], action) {
                 {
                     name: action.profileName
                 }
-            ]
+            ];
         case DELETE_ONE_PROFILE:
             return [
                 ...state.slice(0, action.index),
                 ...state.slice(action.index + 1)
-            ]
+            ];
+        default:
+            return state;
     }
 }
 
-default export profileChanges;
+export default storeReducer;
