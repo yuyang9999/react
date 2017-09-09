@@ -13,9 +13,6 @@ export const REMOVE_SELECT_PROFILES = 'remove_select_profiles';
  */
 export const ADD_SYMBOL = 'add_stock_symbol';
 export const DELETE_SYMBOLS = 'delete_stock_symbols';
-export const SELECT_SYMBOL = 'select_stock_symbol';
-export const UNSELECT_SYMBOL = 'unselect_stock_symbol';
-export const REMOVE_SELECT_SYMBOLS = 'remove_select_stock_symbols';
 
 /**
  action 创建函数
