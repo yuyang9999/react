@@ -1,6 +1,9 @@
 
 import {combineReducers} from 'redux';
-import {CREATE_NEW_PROFILE, DELETE_PROFILES, REMOVE_SELECT_PROFILES, SELECT_PROFILE, UNSELET_PROFILE} from './actions';
+import {
+    ADD_SYMBOL, CREATE_NEW_PROFILE, DELETE_PROFILES, DELETE_SYMBOLS, REMOVE_SELECT_PROFILES, SELECT_PROFILE,
+    UNSELET_PROFILE
+} from './actions';
 
 function profilesReducer(state = [], action) {
     switch (action.type) {
@@ -18,7 +21,7 @@ function profilesReducer(state = [], action) {
 
             for (let i = 0; i < state.length; i++) {
                 let profile = state[i];
-                if (deleteArr.indexOf(profile.name) == -1) {
+                if (deleteArr.indexOf(profile.name) === -1) {
                     ret.push(profile);
                 }
             }
@@ -54,9 +57,36 @@ function selectedProfilesReducer(state = [], action) {
     }
 }
 
+
+function profileStocksReducer(state =[], action) {
+    switch (action.type) {
+        case ADD_SYMBOL:
+            if (state.indexOf(action.symbolName) === -1) {
+                return [
+                    ...state,
+                    action.symbolName
+                ]
+            }
+        case DELETE_SYMBOLS:
+            let arr = action.symbols;
+            var ret = [];
+            state.forEach((s, idx, a)=> {
+                if (arr.indexOf(s) === -1) {
+                    ret.push(s);
+                }
+            });
+
+            return ret;
+
+        default:
+            return state;
+    }
+}
+
 const storeReducer = combineReducers({
     profilesReducer,
-    selectedProfilesReducer
+    selectedProfilesReducer,
+    profileStocksReducer,
 });
 
 
