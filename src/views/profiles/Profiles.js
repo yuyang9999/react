@@ -1,12 +1,7 @@
-
 import React, {Component} from 'react';
-import { connect } from 'react-redux';
-import {
-    createNewProfile, deleteProfiles, resetSelectProfiles, selectProfile,
-    unselectProfile
-} from '../../store/actions';
+import {connect} from 'react-redux';
 
-import store from '../../store/store';
+import ProfilesDM from '../../datamodels/ProfilesDataModel';
 import {Link} from 'react-router-dom';
 
 
@@ -34,61 +29,6 @@ AddProfile.propTypes = {
     onAddClick: React.PropTypes.func.isRequired,
 };
 
-class DeleteProfile extends Component {
-
-    componentWillMount() {
-        console.log("will mount");
-    }
-
-    componentDidMount() {
-        console.log('did mount');
-        var self = this;
-
-        this.unscribe = store.subscribe(()=> {
-            const state = store.getState();
-            if (state.selectedProfilesReducer.length >= 1) {
-                self.btn.disabled = false;
-            } else {
-                self.btn.disabled = true;
-            }
-        });
-
-        if (store.getState().selectedProfilesReducer.length === 0) {
-            this.btn.disabled = true;
-        }
-
-
-    }
-
-    componentWillUnmount() {
-        this.unscribe();
-        store.dispatch(resetSelectProfiles());
-    }
-
-    handleDeleteBtnPressed(e) {
-        let arr = store.getState().selectedProfilesReducer;
-        //todo: 有更好的方法吗？
-        store.dispatch(deleteProfiles(arr));
-        store.dispatch(resetSelectProfiles());
-    }
-
-    render() {
-
-        return (
-            <div>
-                <button ref={(ref) => this.btn = ref}
-                    onClick={(e)=> {
-                        this.handleDeleteBtnPressed(e);
-                }}>
-                    delete
-                </button>
-            </div>
-        )
-    }
-}
-
-
-
 
 class ProfileList extends Component {
     render() {
@@ -96,7 +36,7 @@ class ProfileList extends Component {
             <ul>
                 {
                     this.props.profiles.map((profile, idx)=> {
-                    return <Profile profile={profile} key={profile.name} />
+                        return <Profile profile={profile} key={profile.name} {...this.props} />
                     })
                 }
             </ul>
@@ -115,11 +55,7 @@ class Profile extends Component {
         const node = this.input;
         const checked = node.checked;
 
-        if (checked) {
-            store.dispatch(selectProfile(this.props.profile.name));
-        } else {
-            store.dispatch(unselectProfile(this.props.profile.name));
-        }
+        this.props.profileChanged(this.props.profile.name, checked);
     }
 
     render() {
@@ -137,30 +73,105 @@ class Profile extends Component {
 
 Profile.propTypes = {
     profile: React.PropTypes.object.isRequired,
-    profileOnChecked: React.PropTypes.func,
-    profileOnUnChecked: React.PropTypes.func
+    profileChanged: React.PropTypes.func.isRequired,
 };
 
 
 class ProfileWrapper extends  Component {
-    render() {
-        const {dispatch, profiles} = this.props;
+    constructor(props) {
+        super(props);
 
+        this.getProfiles((objs)=> {
+            this.setState({
+                profiles: objs,
+            })
+        });
+
+        this.state = {
+            profiles: [],
+            deleteBtnDisable: true,
+        };
+
+        this.selectedProfiles = new Set();
+    }
+
+    getProfiles(cb) {
+        ProfilesDM.getProfiles((profiles)=> {
+            let objs = profiles.map((elem, idx, arr)=> {
+                return {name: elem};
+            });
+
+            cb(objs);
+        });
+    }
+
+
+    render() {
         return (
             <div>
-                <AddProfile onAddClick={(name)=> dispatch(createNewProfile(name))}/>
-                <DeleteProfile/>
-                <ProfileList profiles={profiles} />
+                <AddProfile onAddClick={(name)=> {
+                    ProfilesDM.addOneProfile(name, (isSucceed)=> {
+                        this.getProfiles((objs)=> {
+                            this.setState({
+                                profiles: objs,
+                            })
+                        });
+                    })
+                }}/>
+
+                <div>
+                    <button ref={(ref) => this.btn = ref} disabled={this.state.deleteBtnDisable}
+                            onClick={(e)=> {
+                                if (this.selectedProfiles.size === 0) {
+                                    return;
+                                }
+
+                                const toDeleteArr = Array.from(this.selectedProfiles);
+                                ProfilesDM.deleteOneProfile(toDeleteArr, (isSucceed)=> {
+                                    if (isSucceed) {
+                                        this.getProfiles((objs)=> {
+                                            this.setState({
+                                                profiles: objs,
+                                            });
+                                        })
+                                    }
+                                });
+                                this.selectedProfiles.clear();
+                                this.setState({
+                                    deleteBtnDisable: true,
+                                });
+                            }}>
+                        delete
+                    </button>
+                </div>
+
+                <ProfileList profiles={this.state.profiles} profileChanged = {(proName, selected)=> {
+                    if (selected) {
+                        this.selectedProfiles.add(proName);
+                    } else {
+                        this.selectedProfiles.delete(proName);
+                    }
+
+                    if (this.selectedProfiles.size == 0) {
+                        this.setState({
+                            deleteBtnDisable: true,
+                        });
+                    } else {
+                        this.setState({
+                            deleteBtnDisable: false,
+                        });
+                    }
+                }} />
             </div>
         );
     }
 }
 
-//map from store to the properties
-function select(state) {
-    return {profiles: state.profilesReducer};
-}
+// //map from store to the properties
+// function select(state) {
+//     return {profiles: state.profilesReducer};
+// }
 
 
-export default connect(select)(ProfileWrapper);
+export default ProfileWrapper;
 
