@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 
 import ProfilesDM from '../../datamodels/ProfilesDataModel';
+import Security from '../../datamodels/Security';
 import {Link} from 'react-router-dom';
 
 
@@ -81,10 +82,14 @@ class ProfileWrapper extends  Component {
     constructor(props) {
         super(props);
 
-        this.getProfiles((objs)=> {
-            this.setState({
-                profiles: objs,
-            })
+        // this.getProfiles((objs)=> {
+        //     this.setState({
+        //         profiles: objs,
+        //     })
+        // });
+
+        Security.getAccesstoken(()=> {
+
         });
 
         this.state = {
