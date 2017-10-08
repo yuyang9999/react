@@ -1,4 +1,6 @@
 
+import Security from './Security';
+
 let server_addr = 'http://localhost:8080/';
 let api_version = 'api/';
 
@@ -8,8 +10,12 @@ let api_deleteProfiles = server_addr + api_version + 'profile_delete';
 let api_addOneProfile = server_addr + api_version + 'profile_add';
 
 
+
 class ProfilesDataModel {
+
+
     static getProfiles(cmpHandler) {
+
         fetch(api_profiles).then((resp)=> {
             if (resp.ok) {
                 return resp.json();

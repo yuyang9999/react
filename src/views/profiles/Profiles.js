@@ -4,7 +4,9 @@ import {connect} from 'react-redux';
 import ProfilesDM from '../../datamodels/ProfilesDataModel';
 import Security from '../../datamodels/Security';
 import {Link} from 'react-router-dom';
+import Auth_reg  from '../../requests/fetch_utilis';
 
+import { withRouter } from 'react-router-dom'
 
 class AddProfile extends Component {
     handleClick(e) {
@@ -88,6 +90,7 @@ class ProfileWrapper extends  Component {
         //     })
         // });
 
+
         Security.getAccesstoken(()=> {
 
         });
@@ -98,6 +101,8 @@ class ProfileWrapper extends  Component {
         };
 
         this.selectedProfiles = new Set();
+
+
     }
 
     getProfiles(cb) {
@@ -110,6 +115,8 @@ class ProfileWrapper extends  Component {
         });
     }
 
+    componentDidMount() {
+    }
 
     render() {
         return (
@@ -176,6 +183,7 @@ class ProfileWrapper extends  Component {
 // function select(state) {
 //     return {profiles: state.profilesReducer};
 // }
+
 
 
 export default ProfileWrapper;
