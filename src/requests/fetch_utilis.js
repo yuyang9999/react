@@ -28,6 +28,26 @@ class Fetch_util {
     static oauth_object;
     static oauth_time;
 
+
+    static loadCookieAuthIfNeeded() {
+        if (Fetch_util.oauth_object) {
+            return;
+        }
+        let oauth_string = Cookie_utility.getCookie("auth_obj");
+        let oauth_date_string = Cookie_utility.getCookie("auth_date");
+
+        if (!oauth_string || !oauth_date_string) {
+            return;
+        }
+
+        let oauth_obj = JSON.parse(oauth_string);
+        let oauth_date = new Date(Date.parse(oauth_date_string));
+
+        Fetch_util.oauth_object = oauth_obj;
+        Fetch_util.oauth_time = oauth_date;
+
+    }
+
     static checkRequireAuth() {
         if (!Fetch_util.oauth_object) {
             let oauth_string = Cookie_utility.getCookie("auth_obj");
@@ -104,10 +124,71 @@ class Fetch_util {
     }
 
     static fetchGetRequest(uri, para_obj,cb) {
+        Fetch_util.loadCookieAuthIfNeeded();
 
+        let params = '';
+        if (para_obj) {
+            params = Fetch_util.getURIEncodedObject(para_obj);
+        }
+
+        let token = Fetch_util.oauth_object.access_token;
+        if (params != '') {
+            uri = uri + '?' + params;
+        }
+
+        fetch(uri, {
+            method: 'GET',
+            headers: {
+                Authorization: 'Bearer ' + token,
+                "accept": "application/json"
+            },
+        }).then((resp)=> {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then((jsonResp)=> {
+            if (jsonResp) {
+                cb(jsonResp);
+            }
+        }).catch((e)=> {
+            console.log(e);
+        });
     }
 
-    static fetchPostRequest(uri, sendDataObj, cb) {
+    static fetchPostRequest(uri, paraObj, sendDataObj, cb) {
+        Fetch_util.loadCookieAuthIfNeeded();
+
+        let params = '';
+        if (paraObj) {
+            params = Fetch_util.getURIEncodedObject(paraObj);
+        }
+        let token = Fetch_util.oauth_object.access_token;
+        if (params != '') {
+            uri = uri + "?" + params;
+        }
+        let body = {};
+        if (sendDataObj) {
+            body = {'body': JSON.stringify(sendDataObj)}
+        }
+
+        fetch(uri, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + token,
+                "accept": "application/json"
+            },
+            ...body
+        }).then((resp)=> {
+            if (resp.ok) {
+                return resp.json();
+            }
+        }).then((jsonResp)=> {
+            if (jsonResp) {
+                cb(jsonResp);
+            }
+        }).catch((e)=> {
+            console.log(e);
+        })
 
     }
 

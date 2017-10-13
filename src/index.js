@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import About from './views/about';
-import Profiles from './views/profiles/Profiles';
-import Profile from './views/profile';
+// import Profiles from './views/profiles/Profiles';
+import Profile from './views/profiles';
 import DetailProfile from './views/profiles/profileDetail';
 import Login from './views/login';
 import Register from './views/register';
+import ProfileDetail from './views/profileDetail';
 
 import registerServiceWorker from './registerServiceWorker';
 // import {redirectNonAuth} from './requests/redirectNonAuth';
@@ -39,7 +40,7 @@ ReactDOM.render((
             <Route path={"/profiles"} component={Profile} />
             <Route path={"/login"} component={Login} />
             <Route path={"/register"} component={Register} />
-            <Route path={"/profile/:profile_id"} component={DetailProfile} />
+            <Route path={"/profile/:profile_id"} component={ProfileDetail} />
         </div>
     </Router>
     </Provider>
