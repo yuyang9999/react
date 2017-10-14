@@ -113,79 +113,83 @@ class ProfileDetail extends Component {
         let self = this;
 
         return (
-            <div style={{paddingLeft:10, paddingTop:10}}>
-                <Suggest pname={this.profile_name} ref={(ref)=> {this.suggest = ref;}} />
-                <input type={'text'} placeholder={'price'} ref={(ref)=>{this.price = ref;}}/>
-                <br />
-                <input type={'text'} placeholder={'share'} ref={(ref)=>{this.share = ref;}}/>
-                <br />
-                <DatePicker
-                    selected ={this.state.startDate}
-                    onChange={this.handleChange}
-                            />
+            <div style={{paddingLeft:10, paddingTop:30, display:'flex', justifyContent:'center'}}>
+                <div>
+                    <Suggest pname={this.profile_name} ref={(ref)=> {this.suggest = ref;}} />
+                    <input type={'text'} placeholder={'price'} ref={(ref)=>{this.price = ref;}}/>
+                    <br />
+                    <input type={'text'} placeholder={'share'} ref={(ref)=>{this.share = ref;}}/>
 
-                <button onClick={(evt)=> {
-                    //check the validness of input
-                    let symbol = this.suggest.state.value;
-                    let price = this.price.value;
-                    let share = this.share.value;
-                    if (!symbol || symbol.length < 2) {
-                        alert('symbol is not valid');
-                        return;
-                    }
-                    if (!isNumeric(price) && price >= 0) {
-                        alert("price is not valid");
-                        return;
-                    }
+                    <DatePicker selected ={this.state.startDate} onChange={this.handleChange} />
 
-                    if (!isNumeric(share) && share >= 0) {
-                        alert('share is not valid');
-                        return;
-                    }
-
-                    let date = this.state.startDate;
-                    let dateString = date.format("YYYY-MM-DD");
-
-                    Profile_reqs.createNewProfileStock(self.profile_name, symbol, share, price, dateString, (resp)=> {
-                        if (resp.hasError) {
-                            alert(resp.errorMsg);
+                    <button onClick={(evt)=> {
+                        //check the validness of input
+                        let symbol = this.suggest.state.value;
+                        let price = this.price.value;
+                        let share = this.share.value;
+                        if (!symbol || symbol.length < 2) {
+                            alert('symbol is not valid');
+                            return;
+                        }
+                        if (!isNumeric(price) && price >= 0) {
+                            alert("price is not valid");
                             return;
                         }
 
-                        self.getAllProfiles();
-                    });
-                }
-                }>
-                    add
-                </button>
-                <br />
+                        if (!isNumeric(share) && share >= 0) {
+                            alert('share is not valid');
+                            return;
+                        }
 
-                <table>
-                    {
-                        this.state.stocks.map((stock, idx)=> {
-                            let t = new moment(stock.boughtTime);
+                        let date = this.state.startDate;
+                        let dateString = date.format("YYYY-MM-DD");
 
-                            return (
-                              <tr key={stock.sid} >
-                                  <td>{stock.sname}</td>
-                                  <td>{stock.price}</td>
-                                  <td>{stock.share}</td>
-                                  <td>{t.format("YYYY-MM-DD")}</td>
-                                  <td><button onClick = {(evt)=> {
-                                      Profile_reqs.deleteProfileStock(this.profile_name, stock.sid, (resp)=> {
-                                          if (resp.hasError) {
-                                              alert(resp.errorMsg);
-                                              return;
-                                          }
+                        Profile_reqs.createNewProfileStock(self.profile_name, symbol, share, price, dateString, (resp)=> {
+                            if (resp.hasError) {
+                                alert(resp.errorMsg);
+                                return;
+                            }
 
-                                          self.getAllProfiles();
-                                      });
-                                  }}>删除</button></td>
-                              </tr>
-                            );
-                        })
+                            self.getAllProfiles();
+                        });
                     }
-                </table>
+                    }>
+                        add
+                    </button>
+                    <br />
+
+                    <table>
+                        <tr>
+                            <th>symbol</th>
+                            <th>price</th>
+                            <th>share</th>
+                            <th>date</th>
+                        </tr>
+                        {
+                            this.state.stocks.map((stock, idx)=> {
+                                let t = new moment(stock.boughtTime);
+                                return (
+                                    <tr key={stock.sid} >
+                                        <td>{stock.sname}</td>
+                                        <td>{stock.price}</td>
+                                        <td>{stock.share}</td>
+                                        <td>{t.format("YYYY-MM-DD")}</td>
+                                        <td><button onClick = {(evt)=> {
+                                            Profile_reqs.deleteProfileStock(this.profile_name, stock.sid, (resp)=> {
+                                                if (resp.hasError) {
+                                                    alert(resp.errorMsg);
+                                                    return;
+                                                }
+
+                                                self.getAllProfiles();
+                                            });
+                                        }}>删除</button></td>
+                                    </tr>
+                                );
+                            })
+                        }
+                    </table>
+                </div>
 
             </div>
         )

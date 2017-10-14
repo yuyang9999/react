@@ -19,7 +19,9 @@ class Cookie_utility {
         }
         return ""
     }
-
+    static cleanCookie(c_name) {
+        document.cookie = "";
+    }
 
 }
 
@@ -28,6 +30,9 @@ class Fetch_util {
     static oauth_object;
     static oauth_time;
 
+    static cleanupCookie() {
+        Cookie_utility.cleanCookie();
+    }
 
     static loadCookieAuthIfNeeded() {
         if (Fetch_util.oauth_object) {
@@ -123,7 +128,7 @@ class Fetch_util {
         });
     }
 
-    static fetchGetRequest(uri, para_obj,cb) {
+    static fetchGetRequest(uri, para_obj,cb, withToken=true) {
         Fetch_util.loadCookieAuthIfNeeded();
 
         let params = '';
@@ -136,12 +141,19 @@ class Fetch_util {
             uri = uri + '?' + params;
         }
 
+        let header = {
+            Authorization: "Bearer " + token,
+            "accept": "application/json"
+        };
+        if (!withToken) {
+            header = {
+                "accept": "application/json"
+            };
+        }
+
         fetch(uri, {
             method: 'GET',
-            headers: {
-                Authorization: 'Bearer ' + token,
-                "accept": "application/json"
-            },
+            headers: header,
         }).then((resp)=> {
             if (resp.ok) {
                 return resp.json();
@@ -155,7 +167,7 @@ class Fetch_util {
         });
     }
 
-    static fetchPostRequest(uri, paraObj, sendDataObj, cb) {
+    static fetchPostRequest(uri, paraObj, sendDataObj, cb, withToken = true) {
         Fetch_util.loadCookieAuthIfNeeded();
 
         let params = '';
@@ -171,12 +183,19 @@ class Fetch_util {
             body = {'body': JSON.stringify(sendDataObj)}
         }
 
+        let header = {
+            Authorization: "Bearer " + token,
+            "accept": "application/json"
+        };
+        if (!withToken) {
+            header = {
+                "accept": "application/json"
+            };
+        }
+
         fetch(uri, {
             method: "POST",
-            headers: {
-                Authorization: "Bearer " + token,
-                "accept": "application/json"
-            },
+            headers: header,
             ...body
         }).then((resp)=> {
             if (resp.ok) {
@@ -191,6 +210,9 @@ class Fetch_util {
         })
 
     }
+
+
+
 
 
     static checkAndLoadAuthFromSession() {

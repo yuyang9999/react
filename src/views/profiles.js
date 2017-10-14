@@ -1,4 +1,5 @@
 import BaseView from './baseView';
+import Logout from './logout';
 import React, {Component} from 'react';
 import Profile_reqs from '../requests/profiles_reqs';
 import {Link} from 'react-router-dom';
@@ -49,6 +50,7 @@ class ProfileView extends BaseView {
 
         return (
             <div>
+                <Logout {...this.props}/>
                 <input type={"text"} placeholder={"new profile name"} ref={(ref)=> {this.addProfileInput = ref;}}/>
                 <button onClick={(evt)=> {
                     let profileName = self.addProfileInput.value;
