@@ -9,6 +9,8 @@ import DetailProfile from './views/profiles/profileDetail';
 import Login from './views/login';
 import Register from './views/register';
 import ProfileDetail from './views/profileDetail';
+import StockView from './views/stockView';
+import TestView from './views/viewTest';
 
 import registerServiceWorker from './registerServiceWorker';
 // import {redirectNonAuth} from './requests/redirectNonAuth';
@@ -41,6 +43,7 @@ ReactDOM.render((
             <Route path={"/login"} component={Login} />
             <Route path={"/register"} component={Register} />
             <Route path={"/profile/:profile_id"} component={ProfileDetail} />
+            <Route path={"/stock/:stock_symbol"} component={StockView} />
         </div>
     </Router>
     </Provider>

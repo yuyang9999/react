@@ -7,6 +7,7 @@ import Profile_reqs from '../requests/profiles_reqs';
 import DatePicker from 'react-datepicker';
 import moment from 'moment';
 import 'react-datepicker/dist/react-datepicker.css';
+import {Link} from 'react-router-dom';
 
 class Suggest extends Component {
     constructor(props) {
@@ -77,7 +78,8 @@ class ProfileDetail extends Component {
 
         this.state = {
             startDate: moment(),
-            stocks: []
+            stocks: [],
+            stockHistory:{}
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -103,13 +105,17 @@ class ProfileDetail extends Component {
                 return;
             }
 
+            let response = resp.response;
+
             this.setState({
-                stocks: resp.response
+                stocks: response[0],
+                stockHistory: response[1]
             });
         });
     }
 
     render() {
+        let a = '';
         let self = this;
 
         return (
@@ -159,21 +165,41 @@ class ProfileDetail extends Component {
                     <br />
 
                     <table>
+                        <thead>
                         <tr>
                             <th>symbol</th>
                             <th>price</th>
                             <th>share</th>
-                            <th>date</th>
+                            <th>bought date</th>
+                            <th>market price</th>
+                            <th>market date</th>
+                            <th>earning</th>
                         </tr>
+                        </thead>
+                        <tbody>
                         {
                             this.state.stocks.map((stock, idx)=> {
+                                let history = this.state.stockHistory[stock.sname];
+
                                 let t = new moment(stock.boughtTime);
+                                let market_t = new moment();
+                                let market_p = "";
+
+                                if (history) {
+                                    market_t = new moment(history.date);
+                                    market_p = history.clos;
+                                }
+
+                                let earning = (market_p - stock.price) * stock.share;
                                 return (
                                     <tr key={stock.sid} >
-                                        <td>{stock.sname}</td>
+                                        <td><Link to={'/stock/'+stock.sname}>{stock.sname}</Link></td>
                                         <td>{stock.price}</td>
                                         <td>{stock.share}</td>
                                         <td>{t.format("YYYY-MM-DD")}</td>
+                                        <td>{market_p}</td>
+                                        <td>{market_t.format("YYYY-MM-DD")}</td>
+                                        <td>{earning}</td>
                                         <td><button onClick = {(evt)=> {
                                             Profile_reqs.deleteProfileStock(this.profile_name, stock.sid, (resp)=> {
                                                 if (resp.hasError) {
@@ -188,6 +214,7 @@ class ProfileDetail extends Component {
                                 );
                             })
                         }
+                        </tbody>
                     </table>
                 </div>
 

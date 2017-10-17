@@ -36,6 +36,10 @@ class Profiles_reqs {
     static deleteProfileStock(pname, stock_id, cb) {
         Fetch_util.fetchPostRequest("http://localhost:8080/api/profile_symbol_delete", {pname: pname, profile_stock_id:stock_id}, null, cb);
     }
+
+    static getStockHisotory(sname, cb) {
+        Fetch_util.fetchGetRequest("http://localhost:8080/api/stockHistory", {symbol:sname}, cb);
+    }
 }
 
 
