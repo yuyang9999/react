@@ -25,8 +25,16 @@ class Cookie_utility {
 
 }
 
+let noAuthError = {
+    hasError: true,
+    errorMsg: 'not authorized',
+    response: ''
+};
+
 
 class Fetch_util {
+    static address = "";
+
     static oauth_object;
     static oauth_time;
 
@@ -102,7 +110,7 @@ class Fetch_util {
 
         let body = Fetch_util.getURIEncodedObject(authObject);
 
-        fetch('http://localhost:8080/oauth/token', {
+        fetch(Fetch_util.address + '/oauth/token', {
             method: 'POST',
             headers: {
                 "Authorization": authCode,
@@ -131,24 +139,30 @@ class Fetch_util {
     static fetchGetRequest(uri, para_obj,cb, withToken=true) {
         Fetch_util.loadCookieAuthIfNeeded();
 
+        if (withToken && Fetch_util.checkRequireAuth()) {
+            cb(noAuthError);
+            return;
+        }
+
+        let header = {
+            "accept": "application/json"
+        };
+
+        if (withToken) {
+            let token = Fetch_util.oauth_object.access_token;
+            header = {
+                Authorization: "Bearer " + token,
+                "accept": "application/json"
+            };
+        }
+
         let params = '';
         if (para_obj) {
             params = Fetch_util.getURIEncodedObject(para_obj);
         }
 
-        let token = Fetch_util.oauth_object.access_token;
         if (params != '') {
             uri = uri + '?' + params;
-        }
-
-        let header = {
-            Authorization: "Bearer " + token,
-            "accept": "application/json"
-        };
-        if (!withToken) {
-            header = {
-                "accept": "application/json"
-            };
         }
 
         fetch(uri, {
@@ -170,27 +184,34 @@ class Fetch_util {
     static fetchPostRequest(uri, paraObj, sendDataObj, cb, withToken = true) {
         Fetch_util.loadCookieAuthIfNeeded();
 
+        if (withToken && Fetch_util.checkRequireAuth()) {
+            cb(noAuthError);
+            return;
+        }
+
         let params = '';
         if (paraObj) {
             params = Fetch_util.getURIEncodedObject(paraObj);
         }
-        let token = Fetch_util.oauth_object.access_token;
+
+        let header = {
+            "accept": "application/json"
+        };
+
+        if (withToken) {
+            let token = Fetch_util.oauth_object.access_token;
+            header = {
+                Authorization: "Bearer " + token,
+                "accept": "application/json"
+            };
+        }
+
         if (params != '') {
             uri = uri + "?" + params;
         }
         let body = {};
         if (sendDataObj) {
             body = {'body': JSON.stringify(sendDataObj)}
-        }
-
-        let header = {
-            Authorization: "Bearer " + token,
-            "accept": "application/json"
-        };
-        if (!withToken) {
-            header = {
-                "accept": "application/json"
-            };
         }
 
         fetch(uri, {
@@ -210,18 +231,7 @@ class Fetch_util {
         })
 
     }
-
-
-
-
-
-    static checkAndLoadAuthFromSession() {
-
-    }
 }
-
-
-Fetch_util.checkAndLoadAuthFromSession();
 
 export default Fetch_util;
 

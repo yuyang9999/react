@@ -10,7 +10,6 @@ import Login from './views/login';
 import Register from './views/register';
 import ProfileDetail from './views/profileDetail';
 import StockView from './views/stockView';
-import TestView from './views/viewTest';
 
 import registerServiceWorker from './registerServiceWorker';
 // import {redirectNonAuth} from './requests/redirectNonAuth';
