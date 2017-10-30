@@ -20,16 +20,16 @@ class Login extends Component {
                     let userName = self.userNameInput.value;
                     let password = self.passwordInput.value;
 
-                    // if (userName === "") {
-                    //     alert("user name can't be empty");
-                    //     return;
-                    // }
-                    // if (password === "") {
-                    //     alert("password can't be empty");
-                    //     return;
-                    // }
+                    if (userName === "") {
+                        alert("user name can't be empty");
+                        return;
+                    }
+                    if (password === "") {
+                        alert("password can't be empty");
+                        return;
+                    }
 
-                    Fetch_util.startAuth('tom', '123456', (succeed)=> {
+                    Fetch_util.startAuth(userName, password, (succeed)=> {
                         if (succeed) {
                             self.props.history.replace('/profiles')
                         } else {
